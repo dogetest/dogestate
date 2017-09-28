@@ -1,5 +1,8 @@
 --dogestate protection mod
-FEE = 1
+FEE = minetest.setting_get('dogestate.fee')
+if not FEE then
+  FEE = 1
+end
 
 minetest.register_privilege("freedman", {
 	description = "Wont pay interaction fee.",
@@ -55,20 +58,20 @@ end
 
 --Wrap registered nodes definitions
 local wrap_place_definition=function(name)
-  local old_def = minetest.registered_items[name]
+  local old_def = minetest.registered_nodes[name]
   local old_on_place = old_def.on_place or minetest.item_place
   minetest.override_item(name, { on_place = wrap_on_place(old_on_place) })
 end
 
 local wrap_dig_definition=function(name)
-  local old_def = minetest.registered_items[name]
+  local old_def = minetest.registered_nodes[name]
   local old_on_dig = old_def.on_dig or minetest.node_dig
   minetest.override_item(name, { on_dig = wrap_on_dig(old_on_dig) })
 end
 
-for item in ipairs(minetest.registered_items) do
-  wrap_place_definition(item.name)
-  wrap_dig_definition(item.name)
+for name, definition in pairs(minetest.registered_nodes) do
+  wrap_place_definition(name)
+  wrap_dig_definition(name)
 end
 
 --Wrap minetest.register_node
